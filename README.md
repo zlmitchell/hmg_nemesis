@@ -50,7 +50,7 @@ Most likely nothing, NEMESIS won't install.
 
 | Step | Guidance |
 | ---- | -------- |
-| 1 | Download [NEMESIS Installation Package](ota_package.tar) onto your computer. |
+| 1 | Build the NEMESIS installation package (`ota_package.tar`) on your computer with [06 - Build and test](06-Build-and-Test.md). This fork ships no prebuilt package, so the one you flash is built from the source you can read. |
 | 2 | Prepare an exFAT or FAT32 formatted blank USB drive. |
 | 3 | Copy the downloaded tar file onto the USB, do not extract or repack the archive file. |
 | 4 | Insert into the car's HU USB port, messages such as "No Supported Files" are expected. |

@@ -1,0 +1,7 @@
+# Build outputs: this fork ships no prebuilt installer, build it (06-Build-and-Test.md).
+/ota_package.tar
+Sources/usb_bundle/*.tar
+Sources/native/*.o
+Sources/native/nemesis
+Sources/manager/NEMESIS.apk
+Sources/out/

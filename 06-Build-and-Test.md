@@ -111,5 +111,5 @@ Gen5W flow test was updated for this branch but hasn't been run, because its emu
 
 1. `Sources/tests/api19/run.sh` passes.
 2. `release.sh` finished with `OK` from `verify_tars.sh`, and `SHA256SUMS` matches the files you copy.
-3. The tar on the stick is the one you just built. The prebuilt `ota_package.tar` in the repo root is
-   upstream's SUID build.
+3. The tar on the stick is the one you just built. This fork ships no prebuilt tar, and an
+   `ota_package.tar` downloaded from upstream is the SUID build.

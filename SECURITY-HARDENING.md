@@ -53,9 +53,9 @@ emulator and was updated but not run.
   signature from a key generated on the unit.
 - **uid 1000 is trusted.** Any compromise of a system-uid OEM app is still root.
 - **The firmware's DSP OTA hole stays open.** It is in HMG's firmware, not NEMESIS.
-- **Prebuilt binaries** (`ota_package.tar`, `projection-tbt` APKs/.so, Leafia's patched dex)
-  are not rebuilt by this branch. `ota_package.tar` still contains the **old SUID build**.
-  You must rebuild it (NDK r21e, `make`) for any of this to take effect.
+- **Prebuilt binaries** (`projection-tbt` APKs/.so, Leafia's patched dex) are not rebuilt by
+  this fork. The prebuilt `ota_package.tar` (upstream's SUID build) has been removed; build your
+  own with [06](06-Build-and-Test.md).
 - **`adb.tcp`** still exposes unauthenticated adbd on all interfaces. Don't install it.
 - `/system` is still remounted rw on boot.
 
