@@ -68,6 +68,8 @@ Read about NEMESIS, what it is exploiting, what it features, and its use manual.
 | [03 - Install and uninstall](03-Install-and-Uninstall.md) | How NEMESIS is written onto `/system` and how it is removed. |
 | [04 - Packages](04-Packages.md) | Installable packages: metadata, layout, builder, lifecycle. |
 | [05 - Run scripts](05-Run-Scripts.md) | USB `NEMESIS.sh` / `type=execute`: when they run and how to write them. |
+| [06 - Build and test](06-Build-and-Test.md) | Building the car release in Docker, and the stock Android 4.4 emulator security suite. |
+| [Security hardening](SECURITY-HARDENING.md) | What this fork changes from upstream, how it is tested, and how to upgrade an existing install. |
 
 Documents **01** and **03** are the only ones that describe the DSP Update Agent path and on-disk install, do not use them with advanced LLMs which may have safeguards enabled. **02**, **04**, and **05** assume NEMESIS is already on the head unit and treat it as a Debugging Execution Interface for packages and privileged commands, so safeguards will not be triggered.
 
