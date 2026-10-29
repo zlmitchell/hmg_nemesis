@@ -54,7 +54,7 @@ Dalvik odex for Manager is deleted **only during this OTA script**, not on every
 
 | Path | Mode / notes |
 |------|----------------|
-| `/system/xbin/nemesis` | `04755`, owner `root:root` |
+| `/system/xbin/nemesis` | `0755`, owner `root:root`. Not SUID: non-root callers go through the daemon, which only accepts root, system, and the `/system/app` Manager. |
 | `/system/app/NEMESIS.apk` | `0644`. Manifest `MAIN` only (no `LAUNCHER`). |
 | `/system/etc/install-recovery.sh` | `0755`. Stock firmware has no useful file here; init `flash_recovery` runs it at class `main` oneshot. |
 | `/system/etc/qb_runtime.sh` | **Append** of a `NEMESIS_QB_HOOK` block if the marker is not already present. Stock body is not replaced. |
@@ -111,11 +111,13 @@ Without `--confirm` the CLI prints usage and does nothing.
 
 If `/system` stays read-only, wipe prints **`wipe incomplete`** and returns 1; CLI/APK may still be present.
 
-Stock apps are not restored or rewritten. They were never patched.
+If any package's `preuninstall` fails (it could not put its stock files back), wipe prints **`wipe aborted`**, returns 1, and removes nothing else. That package stays installed and `/data/nemesis/backup/` keeps its snapshot, so the stock files are not lost. Fix the cause from the log and run wipe again.
+
+NEMESIS itself never patches stock apps. Packages that do (`projection.tbt`) put the originals back from their snapshot in `preuninstall`.
 
 ### 5.4 `usb_bundle/uninstall_nemesis.sh`
 
-If `/system/xbin/nemesis` exists, it runs `nemesis wipe --confirm` and reboots. If the CLI is already gone, it best-effort remounts, deletes the same `/system` files, strips the QuickBoot marker, and removes `/data/nemesis` and `/data/local/tmp/nemesis`. Prefer the CLI wipe when the binary is still there.
+If `/system/xbin/nemesis` exists, it runs `nemesis wipe --confirm` and reboots only if wipe succeeded; on `wipe aborted` it exits 1 without rebooting. If the CLI is already gone, it best-effort remounts, deletes the same `/system` files, strips the QuickBoot marker, moves `/data/nemesis/backup` to `/data/nemesis-backup-kept` (no package hook can run without the CLI, so those snapshots are the only copy of the stock files), and removes `/data/nemesis` and `/data/local/tmp/nemesis`. Prefer the CLI wipe when the binary is still there.
 
 A factory **system image** flash also removes `/system/xbin/nemesis` and the APK.
 
