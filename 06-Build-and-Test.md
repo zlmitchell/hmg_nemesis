@@ -16,15 +16,13 @@ It contains NDK r21e (as `Sources/native/Makefile` expects), the `android-30` pl
 (as `Sources/manager/Makefile` expects), build-tools, and a stock Android 4.4 (API 19) x86 emulator. Both
 scripts below build the image on first use.
 
-**Line endings.** Device scripts and make recipes must be LF. Both scripts copy the tree and strip
-`\r` before building, so a Windows (CRLF) checkout builds correctly. The scripts themselves still
-need LF to start under bash. If your checkout is CRLF, run them through a stripped copy:
+**Line endings.** Device scripts, make recipes and the test scripts must be LF. `.gitattributes`
+makes every checkout LF, including on Windows with `core.autocrlf=true`. A clone made before
+`.gitattributes` existed can still have CRLF files, so refresh it once from a clean tree:
 
 ```sh
-sed 's/\r$//' Sources/tests/api19/run.sh > /tmp/run.sh && bash /tmp/run.sh
+git rm -r -q --cached . && git reset -q --hard
 ```
-
-Alternatively, clone with `git config core.autocrlf input`.
 
 ## 2. Build the car release
 
