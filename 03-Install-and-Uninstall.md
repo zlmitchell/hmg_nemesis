@@ -111,11 +111,13 @@ Without `--confirm` the CLI prints usage and does nothing.
 
 If `/system` stays read-only, wipe prints **`wipe incomplete`** and returns 1; CLI/APK may still be present.
 
-Stock apps are not restored or rewritten. They were never patched.
+If any package's `preuninstall` fails (it could not put its stock files back), wipe prints **`wipe aborted`**, returns 1, and removes nothing else. That package stays installed and `/data/nemesis/backup/` keeps its snapshot, so the stock files are not lost. Fix the cause from the log and run wipe again.
+
+NEMESIS itself never patches stock apps. Packages that do (`projection.tbt`) put the originals back from their snapshot in `preuninstall`.
 
 ### 5.4 `usb_bundle/uninstall_nemesis.sh`
 
-If `/system/xbin/nemesis` exists, it runs `nemesis wipe --confirm` and reboots. If the CLI is already gone, it best-effort remounts, deletes the same `/system` files, strips the QuickBoot marker, and removes `/data/nemesis` and `/data/local/tmp/nemesis`. Prefer the CLI wipe when the binary is still there.
+If `/system/xbin/nemesis` exists, it runs `nemesis wipe --confirm` and reboots only if wipe succeeded; on `wipe aborted` it exits 1 without rebooting. If the CLI is already gone, it best-effort remounts, deletes the same `/system` files, strips the QuickBoot marker, moves `/data/nemesis/backup` to `/data/nemesis-backup-kept` (no package hook can run without the CLI, so those snapshots are the only copy of the stock files), and removes `/data/nemesis` and `/data/local/tmp/nemesis`. Prefer the CLI wipe when the binary is still there.
 
 A factory **system image** flash also removes `/system/xbin/nemesis` and the APK.
 

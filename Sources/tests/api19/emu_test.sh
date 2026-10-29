@@ -136,6 +136,28 @@ check "owner recovery flag allows unattended run" 'ran flagged'
 sh_ "umount $USB; rm -f /data/nemesis/usb-recovery"
 sh_ setprop sys.boot_completed 1
 
+echo "== failed preuninstall keeps the package and its snapshot"
+# Last, because the aborted wipe has already removed the usb-handler package.
+t=$(mktemp -d)
+mkdir -p "$t/scripts"
+printf '[nemesis]\nversion=1.0\nid=test.keep\nname=Keep\npreuninstall=scripts/preun.sh\n' >"$t/NEMESIS.data"
+printf '#!/system/bin/sh\n[ -f /data/nemesis/keep-ok ] && exit 0\nexit 1\n' >"$t/scripts/preun.sh"
+(cd "$t" && python3 -c "import zipfile; z = zipfile.ZipFile('k.zip', 'w'); [z.write(p) for p in ('NEMESIS.data', 'scripts/preun.sh')]")
+adb push "$t/k.zip" /data/local/tmp/k.zip >/dev/null
+rm -rf "$t"
+sh_ /system/xbin/nemesis install /data/local/tmp/k.zip >/dev/null
+sh_ "mkdir -p /data/nemesis/backup/test.keep; echo stock > /data/nemesis/backup/test.keep/f"
+listed() { sh_ /system/xbin/nemesis pkg-list | grep -q "^test.keep|"; }
+out=$(sh_ /system/xbin/nemesis uninstall test.keep 2>&1)
+check "uninstall keeps the package when preuninstall fails" 'listed' "$out"
+out=$(sh_ /system/xbin/nemesis install --update /data/local/tmp/k.zip 2>&1)
+check "update refused when the old preuninstall fails" 'echo "$out" | grep -q "update refused" && listed' "$out"
+out=$(sh_ /system/xbin/nemesis wipe --confirm 2>&1)
+check "wipe aborts and keeps /data/nemesis/backup" 'echo "$out" | grep -q "wipe aborted" && sh_ cat /data/nemesis/backup/test.keep/f | grep -q stock' "$out"
+sh_ touch /data/nemesis/keep-ok
+out=$(sh_ /system/xbin/nemesis uninstall test.keep 2>&1)
+check "uninstall completes once preuninstall succeeds" '! listed' "$out"
+
 echo
 echo "passed $pass, failed $failed"
 [ -n "${KEEP:-}" ] || adb emu kill >/dev/null 2>&1
