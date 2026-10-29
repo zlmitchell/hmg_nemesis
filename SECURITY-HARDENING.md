@@ -16,6 +16,8 @@ callers that need it, without changing how packages, services, or the Manager wo
 | Log file `0666`, logs dir `0777` | `0644` / `0755`. Service logs are opened by root before the uid drop | `util.c` |
 | `/data/nemesis/apps` left **0777**: the installer `mkdir -p`s it as root with umask 0, and package hooks in it run as root | `ensure_dirs` resets it to `0755`, and the root CLI runs with `umask(022)` | `util.c`, `main.c` |
 | `/data/nemesis/bin` not reset if it already exists. Root package hooks (Leafia) put it first in `PATH` | `ensure_dirs` resets it to `0755`. The emulator test seeds it `0777` | `util.c` |
+| A failed `preuninstall` was ignored: the package was removed anyway, and `wipe` then deleted `/data/nemesis/backup`, the only copy of the stock files | Uninstall and `install --update` keep the package (exit 3). `wipe` aborts and keeps `/data/nemesis`. From upstream #31 | `pkg.c`, `uninstall_nemesis.sh` |
+| `mount -o rw,remount` / `-o ro,remount` slipped past the hook `mount` wrapper | Wrapper matches any `remount`. From upstream #9 | `util.c` |
 
 ## Testing on a stock Android 4.4 emulator
 
@@ -30,7 +32,7 @@ Sources/tests/api19/run.sh 167b71d    # upstream, as a baseline
 
 | | upstream `167b71d` | this branch |
 |---|---|---|
-| Result | 6 passed, **8 failed** | **14 passed** |
+| Result | 6 passed, **8 failed** (of the first 14) | **18 passed** |
 | Other app / adb shell uid gets root | `uid=0(root)` | refused |
 | CLI | `-rwsr-xr-x` | `-rwxr-xr-x` |
 | Other uid starts DialogActivity | `Status: ok` | Permission Denial |
