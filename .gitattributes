@@ -1,0 +1,13 @@
+# Device scripts run on the head unit's shell and break on CRLF; make recipes and the
+# test scripts need LF too. Keep every text file LF in every checkout, whatever
+# core.autocrlf says (Git for Windows defaults it to true).
+* text=auto eol=lf
+
+# Binaries: never touch line endings or diff them as text.
+*.apk       binary
+*.jar       binary
+*.keystore  binary
+*.png       binary
+*.so        binary
+*.tar       binary
+*.zip       binary
